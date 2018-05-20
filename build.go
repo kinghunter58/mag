@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"regexp"
 
@@ -24,6 +25,9 @@ func buildAction(c *cli.Context) error {
 	}
 	root := filepath.Dir(os.Args[0])
 	// fmt.Println("root", root)
+	// _, filename, _, _ := runtime.Caller(0)
+	root = path.Dir(os.Args[0])
+	fmt.Println(root)
 	_, err := os.Stat(filepath.ToSlash(root) + "/magconfig.json")
 	if err != nil {
 		return errNotInMag
