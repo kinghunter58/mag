@@ -21,37 +21,22 @@ func newP(c *cli.Context) error {
 	}
 	projectName := c.Args().Get(0)
 
-	go ngNew(projectName, ngChan)
-
 	GOPATH := getGOPATH()
 	GOPATH = filepath.ToSlash(GOPATH)
-	server := GOPATH + "/src/github.com/kinghunter/" + magStack + "/server"
-
-	//Create the project dir
-	err := os.Mkdir(projectName, os.ModePerm)
-	if err != nil {
+	// server := GOPATH + "/src/github.com/kinghunter58/server-templ"
+	if err := os.Mkdir(projectName, os.ModePerm); err != nil {
 		return err
 	}
+	go ngNew(projectName, ngChan)
 
-	//Create the main.go
-	err = copyFile(server+"/main.go", projectName+"/main.go")
-	if err != nil {
+	cmd := exec.Command("git", "clone", "http://github.com/kinghunter58/server-templ", projectName)
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	if err := cmd.Run(); err != nil {
 		return err
 	}
-
-	//Create init.go file
-	err = copyFile(server+"/init.go", projectName+"/init.go")
-	if err != nil {
-		return err
-	}
-
-	//Create the config.go file
-	err = os.MkdirAll(projectName+"/vendor/config", os.ModePerm)
-	if err != nil {
-		return err
-	}
-	err = copyFile(server+"/vendor/config/config.go", projectName+"/vendor/config/config.go")
-	if err != nil {
+	if err := os.RemoveAll(projectName + "/.git/"); err != nil {
 		return err
 	}
 
